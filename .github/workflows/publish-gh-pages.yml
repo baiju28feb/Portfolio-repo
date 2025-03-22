@@ -39,23 +39,8 @@ jobs:
         $indexHtml = "release/wwwroot/index.html"
         $content = Get-Content -Path $indexHtml -Raw
         $repository = "${{ github.repository }}" -split '/', 2 | Select-Object -Last 1
-        if ($content -match '<base href="/"') {
-          $content = $content -replace '<base href="/"', "<base href=`"/$repository/`""
-        }
-        # Check if empty base tag exists
-        elseif ($content -match '<base\s*/>') {
-          $content = $content -replace '<base\s*/>', "<base href=`"/$repository/`" />"
-        }
-        # Check if base tag with dynamic script exists
-        elseif ($content -match '<base\s*>') {
-          $content = $content -replace '<base\s*>', "<base href=`"/$repository/`">"
-        }
-        # If no base tag is found, add one
-        else {
-          $content = $content -replace '<head>', "<head>`n    <base href=`"/$repository/`" />"
-        }
+        $content = $content -replace '<base href="/"', "<base href=`"/$repository/`""
         Set-Content -Path $indexHtml -Value $content -NoNewline
-        Write-Host "Base href has been updated to /$repository/"
         
     - name: Add .nojekyll file
       run: touch release/wwwroot/.nojekyll
