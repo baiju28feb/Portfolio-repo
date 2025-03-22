@@ -1,9 +1,6 @@
 name: Publish Blazor App to GitHub Pages
 
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
+on: [ push, workflow_dispatch ]
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
@@ -11,44 +8,83 @@ permissions:
   pages: write
   id-token: write
 
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
 jobs:
-  build-and-deploy:
+  build_test_artifact:
+    name: Build App
+
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Checkout repository
+    - name: Checkout
       uses: actions/checkout@v4
-      
+
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '8.x'
-        
-    - name: Restore dependencies
-      run: dotnet restore
-      
-    - name: Build and publish
+
+    # - name: Set basepath on index.html
+    #   shell: pwsh
+    #   run: |
+    #     $filepath = "./src/BlazorApp/wwwroot/index.html"
+    #     $repository = "${{ github.repository }}" -replace "${{ github.repository_owner }}", ""
+
+    #     $html = Get-Content -Path $filepath
+    #     $html -replace "<base href=`"/`" />", "<base href=`"$repository/`" />" | Out-File -Path $filepath -Force
+
+    # - name: Set basepath on JSON objects
+    #   shell: pwsh
+    #   run: |
+    #     $filepath = "./src/BlazorApp/wwwroot/sample-data"
+    #     $repository = "${{ github.repository }}" -replace "${{ github.repository_owner }}", ""
+
+    #     Get-ChildItem -Path $filepath -Filter "*.json" | ForEach-Object {
+    #       $json = Get-Content -Path $_.FullName
+    #       $json.Replace("../", "$repository/") | Out-File -Path $_.FullName -Force
+    #     }
+
+    - name: Restore NuGet packages
+      shell: bash
       run: |
-        dotnet build --configuration Release
-        dotnet test --configuration Release --no-build
-        dotnet publish src/BlazorApp -c Release -o release --nologo
-        
-    - name: Update base href
-      shell: pwsh
+        dotnet restore .
+
+    - name: Build solution
+      shell: bash
       run: |
-        $indexHtml = "release/wwwroot/index.html"
-        $content = Get-Content -Path $indexHtml -Raw
-        $repository = "${{ github.repository }}" -split '/', 2 | Select-Object -Last 1
-        $content = $content -replace '<base href="/"', "<base href=`"/$repository/`""
-        Set-Content -Path $indexHtml -Value $content -NoNewline
-        
-    - name: Add .nojekyll file
-      run: touch release/wwwroot/.nojekyll
-        
-    - name: Deploy to GitHub Pages
-      uses: JamesIves/github-pages-deploy-action@v4
+        dotnet build .
+
+    - name: Test solution
+      shell: bash
+      run: |
+        dotnet test . -c Release
+
+    - name: Publish artifact
+      shell: bash
+      run: |
+        dotnet publish src/BlazorApp -c Release -o published
+
+    - name: Upload artifact for web
+      uses: actions/upload-pages-artifact@v1
       with:
-        folder: release/wwwroot
-        token: ${{ secrets.GITHUB_TOKEN }}
-        branch: gh-pages
-        clean: true
+        path: published/wwwroot
+
+  deploy:
+    name: Deploy App to GitHub Pages
+    needs:
+    - build_test_artifact
+
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v1
