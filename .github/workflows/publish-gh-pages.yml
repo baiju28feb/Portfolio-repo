@@ -48,6 +48,7 @@ jobs:
       with:
         name: blazor-app
         path: published/wwwroot
+        retention-days: 1
   deploy:
     name: Deploy App to GitHub Pages
     needs: build_test_artifact
@@ -65,4 +66,4 @@ jobs:
         path: ./_site
     - name: Deploy to GitHub Pages
       id: deployment
-      uses: actions/deploy-pages@v1
+      uses: actions/deploy-pages@v2
