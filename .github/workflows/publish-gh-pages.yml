@@ -44,7 +44,7 @@ jobs:
       run: |
         dotnet publish src/BlazorApp -c Release -o published
     - name: Upload artifact for web
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: blazor-app
         path: published/wwwroot
@@ -59,7 +59,7 @@ jobs:
     - name: Setup Pages
       uses: actions/configure-pages@v3
     - name: Download artifact
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: blazor-app
         path: ./_site
