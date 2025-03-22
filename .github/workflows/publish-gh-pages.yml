@@ -33,7 +33,7 @@ jobs:
         $indexHtml = "release/wwwroot/index.html"
         $content = Get-Content -Path $indexHtml -Raw
         $repository = "${{ github.repository }}" -split '/', 2 | Select-Object -Last 1
-        $content = $content -replace '<base href="/"', "<base href=\"/$repository/\""
+        $content = $content -replace '<base href="/"', "<base href=`"/$repository/`""
         Set-Content -Path $indexHtml -Value $content -NoNewline
         
     - name: Add .nojekyll file
