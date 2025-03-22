@@ -1,69 +1,47 @@
 name: Publish Blazor App to GitHub Pages
-on: [ push, workflow_dispatch ]
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: write
-  pages: write
-  id-token: write
-# Allow one concurrent deployment
-concurrency:
-  group: "pages"
-  cancel-in-progress: true
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
 jobs:
-  build_test_artifact:
-    name: Build App
+  build-and-deploy:
     runs-on: ubuntu-latest
+    
     steps:
-    - name: Checkout
+    - name: Checkout repository
       uses: actions/checkout@v4
+      
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: '8.x'
-    - name: Set basepath on index.html
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build and publish
+      run: |
+        dotnet build --configuration Release
+        dotnet test --configuration Release --no-build
+        dotnet publish src/BlazorApp -c Release -o release --nologo
+        
+    - name: Update base href
       shell: pwsh
       run: |
-        $filepath = "./src/BlazorApp/wwwroot/index.html"
+        $indexHtml = "release/wwwroot/index.html"
+        $content = Get-Content -Path $indexHtml -Raw
         $repository = "${{ github.repository }}" -split '/', 2 | Select-Object -Last 1
-        $html = Get-Content -Path $filepath
-        $html -replace "<base href=`"/`" />", "<base href=`"/$repository/`" />" | Out-File -Path $filepath -Force
-    - name: Restore NuGet packages
-      shell: bash
-      run: |
-        dotnet restore .
-    - name: Build solution
-      shell: bash
-      run: |
-        dotnet build .
-    - name: Test solution
-      shell: bash
-      run: |
-        dotnet test . -c Release
-    - name: Publish artifact
-      shell: bash
-      run: |
-        dotnet publish src/BlazorApp -c Release -o published
-    - name: Upload artifact for web
-      uses: actions/upload-artifact@v4
-      with:
-        name: blazor-app
-        path: published/wwwroot
-        retention-days: 1
-  deploy:
-    name: Deploy App to GitHub Pages
-    needs: build_test_artifact
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-    - name: Setup Pages
-      uses: actions/configure-pages@v3
-    - name: Download artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: blazor-app
-        path: ./_site
+        $content = $content -replace '<base href="/"', "<base href=\"/$repository/\""
+        Set-Content -Path $indexHtml -Value $content -NoNewline
+        
+    - name: Add .nojekyll file
+      run: touch release/wwwroot/.nojekyll
+        
     - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v2
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        folder: release/wwwroot
+        branch: gh-pages
+        clean: true
