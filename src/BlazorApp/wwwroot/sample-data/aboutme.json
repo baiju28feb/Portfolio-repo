@@ -1,12 +1,12 @@
 {
-  "description": "I'm a UI/UX student studying at Barnett Technical University. I enjoy creating unique and simplistic user interfaces in creative ways.",
+  "description": "I am a Full-Stack engineer, I am passionate about .Net and My goal is to create accessible, user-friendly,robust digital solutions that leaves an impact",
   "skills": [
-    "Web design",
-    "User experience",
-    "Inclusive design",
-    "Focus group testing",
-    "Mobile user interfaces",
-    "Graphic design"
+    "Web Developemnt",
+    "Windows Application",
+    "C# /.NET Core/ MVC",
+    "React",
+    "EF Core / SQL Seerver",
+    "Web API / RESTful Services"
   ],
-  "detailOrQuote": "I am passionate about solving problems in new creative ways to drive innovation. By leveraging my UI/UX experience I continually look for new and better ways to make tech accessible by all."
+  "detailOrQuote": "Working as Full-stack Developer specializing in .NET, Angular and SQL Server. My passion lies in developing efficient web applications, managing SQL databases, and ensuring seamless deployment. I am committed to creating dynamic, scalable, and user-centric web applications using modern technologies.Looking forward to sharpening my skills in a challenging environment. I guarantee enthusiasm in work and fulfilling my projects with inexpressible effort."
 }
