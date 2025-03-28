@@ -1,13 +1,13 @@
 [
   {
-    "title": "10 Things To Know About Azure Static Web Apps 🎉",
-    "description": "Collaboration to create a beginner friendly article to help explain Azure Static Web Apps and tooling to get started.",
-    "url": "https://dev.to/azure/10-things-to-know-about-azure-static-web-apps-3n4i"
+    "title": "Learning Clean Architecture by coding with .Net",
+    "description": "Creating a Sample .Net application based on clean architecture",
+    "url": "https://medium.com/@baiju28feb/learning-clean-architecture-by-coding-with-net-6-1a00f86af643"
   },
   {
-    "title": "Web Development for Beginners",
-    "description": "Contributed sketch note imagery to accompany each lesson. These help provide visual representation of what is being taught.",
-    "url": "https://github.com/microsoft/web-dev-for-beginners"
+    "title": "Demystifying Dependency Injection in C# : A Tale of Code Harmony",
+    "description": "My take on dependency injection in .Net",
+    "url": "https://medium.com/@baiju28feb/demystifying-dependency-injection-in-c-a-tale-of-code-harmony-5670110498ca"
   },
   {
     "title": "My Resume Site",
